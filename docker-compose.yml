@@ -1,0 +1,9 @@
+version: '3.3'  # Specifies the version of the Docker Compose file format.
+
+services:
+
+  # Car Connection App Service
+  car-connector-app:
+    build: .
+    ports:
+      - "3001:3001"  # Exposing the application on port 3001.
