@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const routerApi = require('./routes');
 
-// Error handling utilities
+// Import custom middleware for error handling
 const { 
     logErrors, 
     errorHandler, 
@@ -12,15 +12,16 @@ const {
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Enable Express to parse JSON bodies in requests
+// Middleware to parse JSON bodies in incoming requests
 app.use(express.json());
 
-// Define a whitelist of domains that can access the API
-const whitelist = ['http://localhost:3000' , 'http://localhost'];
+// Whitelist of domains allowed to access the API
+const whitelist = ['http://localhost:3000', 'http://localhost'];
 
 const corsOptions = {
+  // Custom CORS function to check incoming requests against the whitelist
   origin: (origin, callback) => {
-    // Check if the request origin is in the whitelist or not present (server-to-server requests)
+    // Allow requests from whitelisted domains or server-to-server requests (no origin)
     if (whitelist.includes(origin) || !origin) {
       callback(null, true);
     } else {
@@ -29,23 +30,23 @@ const corsOptions = {
   }
 };
 
-// Apply CORS settings based on whitelist
+// Apply CORS middleware with the configured options
 app.use(cors(corsOptions));
 
-// Basic route for a health check or welcome message
+// Simple route for API health check or initial greeting
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
 });
 
-// Initialize API routes
+// Setup API routes through a routing middleware
 routerApi(app);
 
-// Register middleware for error handling
-app.use(logErrors);
-app.use(boomErrorHandler);
-app.use(errorHandler);
+// Error handling middleware
+app.use(logErrors); // Logs errors
+app.use(boomErrorHandler); // Handles errors thrown by 'boom'
+app.use(errorHandler); // Generic error handler
 
-// Start the server
+// Start the Express server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
